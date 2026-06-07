@@ -1,0 +1,111 @@
+erDiagram
+    IDENTITIES {
+        uuid identity_id PK
+        uuid member_id UK
+        string subject_type
+        string status
+        timestamptz created_at
+        timestamptz updated_at
+        timestamptz deleted_at
+    }
+
+    IDENTITY_CONTACTS {
+        uuid contact_id PK
+        uuid identity_id FK
+        string contact_type
+        bytes encrypted_value
+        string lookup_hash UK
+        string key_version
+        boolean is_primary
+        timestamptz verified_at
+        timestamptz created_at
+    }
+
+    AUTH_ACCOUNTS {
+        uuid auth_account_id PK
+        uuid identity_id FK
+        string auth_method
+        string password_hash
+        string provider_subject
+        boolean mfa_enabled
+        timestamptz last_login_at
+        timestamptz created_at
+    }
+
+    OTP_CHALLENGES {
+        uuid challenge_id PK
+        uuid contact_id FK
+        string purpose
+        string code_hash
+        int attempt_count
+        timestamptz expires_at
+        timestamptz consumed_at
+        timestamptz created_at
+    }
+
+    REFRESH_SESSIONS {
+        uuid session_id PK
+        uuid auth_account_id FK
+        string token_hash UK
+        string device_hash
+        string ip_hash
+        timestamptz expires_at
+        timestamptz revoked_at
+        timestamptz created_at
+    }
+
+    CONSENT_LEDGER {
+        uuid consent_id PK
+        uuid identity_id FK
+        string scope
+        boolean granted
+        int policy_version
+        string collection_channel
+        string evidence_uri
+        timestamptz effective_at
+        timestamptz recorded_at
+    }
+
+    PUSH_SUBSCRIPTIONS {
+        uuid subscription_id PK
+        uuid identity_id FK
+        string endpoint_hash UK
+        bytes encrypted_endpoint
+        bytes encrypted_p256dh
+        bytes encrypted_auth
+        string key_version
+        string platform
+        boolean enabled
+        timestamptz last_success_at
+        timestamptz created_at
+    }
+
+    CONTACT_PREFERENCES {
+        uuid preference_id PK
+        uuid identity_id FK
+        string channel
+        string purpose
+        boolean enabled
+        string quiet_hours
+        string timezone
+        timestamptz updated_at
+    }
+
+    IDENTITY_AUDIT_LOG {
+        uuid audit_id PK
+        uuid actor_id
+        uuid identity_id
+        string action
+        string purpose
+        string legal_basis
+        string request_id
+        timestamptz occurred_at
+    }
+
+    IDENTITIES ||--o{ IDENTITY_CONTACTS : has
+    IDENTITIES ||--o{ AUTH_ACCOUNTS : authenticates_with
+    IDENTITY_CONTACTS ||--o{ OTP_CHALLENGES : receives
+    AUTH_ACCOUNTS ||--o{ REFRESH_SESSIONS : creates
+    IDENTITIES ||--o{ CONSENT_LEDGER : records
+    IDENTITIES ||--o{ PUSH_SUBSCRIPTIONS : registers
+    IDENTITIES ||--o{ CONTACT_PREFERENCES : configures

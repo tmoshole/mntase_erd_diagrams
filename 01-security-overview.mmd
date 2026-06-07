@@ -1,0 +1,39 @@
+flowchart LR
+    PWA["Mntase PWA"]
+    STAFF["Staff and Mpintshi Apps"]
+    CLIENT["Customer Portal"]
+
+    IDAPI["Identity Service"]
+    COREAPI["Core Application API"]
+    WORKER["Analytics Worker"]
+    REPORTAPI["Reporting API"]
+    PAYAPI["Payment Service"]
+
+    IDDB[("Identity DB<br/>PII + consent contacts")]
+    COREDB[("Operational DB<br/>pseudonymous activity")]
+    ANALYTICSDB[("Analytics DB<br/>aggregates only")]
+    FINDB[("Financial DB<br/>payment references")]
+    LOGS[("Restricted Audit Logs")]
+    KMS["Cloud KMS"]
+
+    PWA --> IDAPI
+    PWA --> COREAPI
+    STAFF --> COREAPI
+    CLIENT --> REPORTAPI
+
+    IDAPI --> IDDB
+    IDAPI --> KMS
+    COREAPI --> COREDB
+    COREAPI --> IDAPI
+    WORKER --> COREDB
+    WORKER --> ANALYTICSDB
+    REPORTAPI --> ANALYTICSDB
+    COREAPI --> PAYAPI
+    PAYAPI --> FINDB
+    PAYAPI --> IDAPI
+
+    IDAPI --> LOGS
+    COREAPI --> LOGS
+    WORKER --> LOGS
+    REPORTAPI --> LOGS
+    PAYAPI --> LOGS

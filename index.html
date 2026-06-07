@@ -1,0 +1,102 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Mntase Database ERDs</title>
+  <style>
+    :root { color-scheme: light; font-family: Arial, sans-serif; }
+    body { margin: 0; background: #f5f1eb; color: #3e2723; }
+    main { width: min(1500px, calc(100% - 32px)); margin: 32px auto; }
+    h1 { margin-bottom: 8px; }
+    .intro { color: #6d5148; margin-bottom: 28px; }
+    .manager-link {
+      display: inline-block;
+      margin: 4px 0 12px;
+      padding: 12px 16px;
+      color: white;
+      background: #8d4f43;
+      border-radius: 10px;
+      text-decoration: none;
+      font-weight: 700;
+    }
+    .card { background: white; border: 1px solid #dfd4cc; border-radius: 16px; margin: 24px 0; padding: 20px; }
+    .heading { display: flex; align-items: center; justify-content: space-between; gap: 16px; }
+    .heading h2 { margin: 0 0 16px; }
+    .heading a { color: #8d4f43; font-weight: 700; margin-left: 12px; }
+    img { display: block; width: 100%; height: auto; border-radius: 8px; }
+  </style>
+</head>
+<body>
+  <main>
+    <h1>Mntase Database ERDs</h1>
+    <p class="intro">Separated Identity, Operational, Analytics, and Financial data architecture.</p>
+    <a class="manager-link" href="./manager-overview.html">The database overview</a>
+    
+      <section class="card">
+        <div class="heading">
+          <h2>Security Boundary Overview</h2>
+          <div>
+            <a href="./01-security-overview.svg">SVG</a>
+            <a href="./01-security-overview.png">PNG</a>
+          </div>
+        </div>
+        <a href="./01-security-overview.svg">
+          <img src="./01-security-overview.svg" alt="Security Boundary Overview ERD" loading="lazy">
+        </a>
+      </section>
+
+      <section class="card">
+        <div class="heading">
+          <h2>Identity Database</h2>
+          <div>
+            <a href="./02-identity-database.svg">SVG</a>
+            <a href="./02-identity-database.png">PNG</a>
+          </div>
+        </div>
+        <a href="./02-identity-database.svg">
+          <img src="./02-identity-database.svg" alt="Identity Database ERD" loading="lazy">
+        </a>
+      </section>
+
+      <section class="card">
+        <div class="heading">
+          <h2>Operational Database</h2>
+          <div>
+            <a href="./03-operational-database.svg">SVG</a>
+            <a href="./03-operational-database.png">PNG</a>
+          </div>
+        </div>
+        <a href="./03-operational-database.svg">
+          <img src="./03-operational-database.svg" alt="Operational Database ERD" loading="lazy">
+        </a>
+      </section>
+
+      <section class="card">
+        <div class="heading">
+          <h2>Analytics Database</h2>
+          <div>
+            <a href="./04-analytics-database.svg">SVG</a>
+            <a href="./04-analytics-database.png">PNG</a>
+          </div>
+        </div>
+        <a href="./04-analytics-database.svg">
+          <img src="./04-analytics-database.svg" alt="Analytics Database ERD" loading="lazy">
+        </a>
+      </section>
+
+      <section class="card">
+        <div class="heading">
+          <h2>Financial Database</h2>
+          <div>
+            <a href="./05-financial-database.svg">SVG</a>
+            <a href="./05-financial-database.png">PNG</a>
+          </div>
+        </div>
+        <a href="./05-financial-database.svg">
+          <img src="./05-financial-database.svg" alt="Financial Database ERD" loading="lazy">
+        </a>
+      </section>
+  </main>
+</body>
+</html>

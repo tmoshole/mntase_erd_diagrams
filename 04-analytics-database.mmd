@@ -1,0 +1,156 @@
+erDiagram
+    DIM_DATE {
+        date date_id PK
+        int year
+        int month
+        int week
+        int day_of_week
+    }
+
+    DIM_LOCATION {
+        uuid location_id PK
+        string grain
+        string province_code
+        string municipality_code
+        string ward_code
+        string display_name
+    }
+
+    DIM_COMMUNITY {
+        uuid community_id PK
+        uuid location_id FK
+        string public_code UK
+        string status
+    }
+
+    DIM_CLIENT {
+        uuid client_id PK
+        string display_name
+        string industry
+    }
+
+    DIM_CAMPAIGN {
+        uuid campaign_id PK
+        uuid client_id FK
+        string campaign_type
+        string title
+        string status
+        date launch_date
+    }
+
+    METRICS_WELLBEING_DAILY {
+        date date_id FK
+        uuid location_id FK
+        uuid community_id FK
+        int eligible_members
+        int respondent_count
+        numeric avg_mood
+        numeric meal_coverage_pct
+        numeric ate_once_pct
+        numeric ate_nothing_pct
+        numeric food_stress_score
+        boolean suppressed
+        timestamptz refreshed_at
+    }
+
+    METRICS_AUDIENCE_CUBE {
+        uuid audience_bucket_id PK
+        uuid location_id FK
+        string age_band
+        string gender_code
+        string language_code
+        int member_count
+        boolean suppressed
+        date snapshot_date
+    }
+
+    METRICS_CAMPAIGN_LIVE {
+        uuid campaign_id FK
+        uuid location_id FK
+        int eligible_count
+        int sent_count
+        int delivered_count
+        int opened_count
+        int response_count
+        int click_count
+        int conversion_count
+        numeric incentive_cost_zar
+        boolean suppressed
+        timestamptz refreshed_at
+    }
+
+    METRICS_SURVEY_OPTIONS {
+        uuid campaign_id FK
+        uuid question_id
+        uuid option_id
+        uuid location_id FK
+        int response_count
+        numeric response_pct
+        boolean suppressed
+        timestamptz refreshed_at
+    }
+
+    METRICS_MPINTSHI_DAILY {
+        date date_id FK
+        uuid community_id FK
+        int verified_members
+        int active_members
+        numeric checkin_rate
+        int attributed_signups
+        int attributed_responses
+        int attributed_conversions
+        numeric accrued_earnings_zar
+        boolean suppressed
+    }
+
+    INSIGHTS {
+        uuid insight_id PK
+        string insight_type
+        uuid location_id FK
+        date period_start
+        date period_end
+        string headline
+        jsonb evidence
+        string methodology_version
+        string status
+        timestamptz generated_at
+    }
+
+    REPORT_EXPORTS {
+        uuid report_id PK
+        uuid client_id FK
+        uuid campaign_id FK
+        string report_type
+        string storage_uri
+        string methodology_version
+        uuid approved_by_actor_id
+        timestamptz generated_at
+        timestamptz expires_at
+    }
+
+    ANALYTICS_REFRESH_RUNS {
+        uuid run_id PK
+        string model_name
+        string source_watermark
+        string status
+        int row_count
+        string error_code
+        timestamptz started_at
+        timestamptz completed_at
+    }
+
+    DIM_LOCATION ||--o{ DIM_COMMUNITY : contains
+    DIM_CLIENT ||--o{ DIM_CAMPAIGN : owns
+    DIM_DATE ||--o{ METRICS_WELLBEING_DAILY : dates
+    DIM_LOCATION ||--o{ METRICS_WELLBEING_DAILY : groups
+    DIM_COMMUNITY ||--o{ METRICS_WELLBEING_DAILY : groups
+    DIM_LOCATION ||--o{ METRICS_AUDIENCE_CUBE : groups
+    DIM_CAMPAIGN ||--o{ METRICS_CAMPAIGN_LIVE : measures
+    DIM_LOCATION ||--o{ METRICS_CAMPAIGN_LIVE : groups
+    DIM_CAMPAIGN ||--o{ METRICS_SURVEY_OPTIONS : measures
+    DIM_LOCATION ||--o{ METRICS_SURVEY_OPTIONS : groups
+    DIM_DATE ||--o{ METRICS_MPINTSHI_DAILY : dates
+    DIM_COMMUNITY ||--o{ METRICS_MPINTSHI_DAILY : measures
+    DIM_LOCATION ||--o{ INSIGHTS : supports
+    DIM_CLIENT ||--o{ REPORT_EXPORTS : receives
+    DIM_CAMPAIGN ||--o{ REPORT_EXPORTS : documents

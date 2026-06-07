@@ -1,0 +1,225 @@
+erDiagram
+    MEMBERS {
+        uuid member_id PK
+        uuid referred_by_org_node_id FK
+        uuid ward_id FK
+        string verification_status
+        string acquisition_source
+        string age_band
+        string gender_code
+        string preferred_language
+        date joined_on
+        timestamptz created_at
+        timestamptz updated_at
+    }
+
+    ORG_NODES {
+        uuid org_node_id PK
+        string node_type
+        string public_code UK
+        uuid ward_id FK
+        string status
+        timestamptz created_at
+    }
+
+    ORG_EDGES {
+        uuid edge_id PK
+        uuid parent_node_id FK
+        uuid child_node_id FK
+        string relationship_type
+        timestamptz valid_from
+        timestamptz valid_to
+    }
+
+    MEMBER_VOUCHES {
+        uuid vouch_id PK
+        uuid member_id FK
+        uuid org_node_id FK
+        uuid vouched_by_actor_id
+        string decision
+        string reason_code
+        timestamptz decided_at
+    }
+
+    MEMBER_CONSENT_STATE {
+        uuid member_id PK
+        string scope PK
+        boolean granted
+        int policy_version
+        uuid source_consent_id
+        timestamptz effective_at
+        timestamptz projected_at
+    }
+
+    EVENTS {
+        uuid event_id PK
+        string event_type
+        string schema_version
+        uuid actor_id
+        string actor_type
+        uuid member_id
+        uuid campaign_id
+        jsonb payload
+        string idempotency_key UK
+        timestamptz occurred_at
+        timestamptz received_at
+    }
+
+    CHECKINS {
+        uuid checkin_id PK
+        uuid member_id FK
+        date local_date
+        int mood_ordinal
+        int breakfast_fullness
+        int lunch_fullness
+        int dinner_fullness
+        string timezone
+        uuid source_event_id FK
+        timestamptz submitted_at
+    }
+
+    MEMBER_STREAKS {
+        uuid member_id PK
+        int current_days
+        int longest_days
+        date last_checkin_date
+        timestamptz calculated_at
+    }
+
+    POINTS_LEDGER {
+        uuid ledger_entry_id PK
+        uuid member_id FK
+        int points_delta
+        string reason_code
+        uuid source_event_id FK
+        uuid campaign_id
+        string idempotency_key UK
+        timestamptz created_at
+    }
+
+    CLIENT_ORGS {
+        uuid client_id PK
+        string display_name
+        string status
+        timestamptz created_at
+    }
+
+    CAMPAIGNS {
+        uuid campaign_id PK
+        uuid client_id FK
+        string campaign_type
+        string title
+        jsonb audience_spec
+        jsonb content
+        numeric budget_zar
+        string status
+        timestamptz submitted_at
+        timestamptz launched_at
+        timestamptz created_at
+    }
+
+    CAMPAIGN_REVIEWS {
+        uuid review_id PK
+        uuid campaign_id FK
+        uuid reviewer_actor_id
+        string decision
+        string ruleset_version
+        jsonb checks
+        string reviewer_note
+        timestamptz reviewed_at
+    }
+
+    SURVEY_QUESTIONS {
+        uuid question_id PK
+        uuid campaign_id FK
+        int position
+        string question_type
+        string prompt
+        boolean required
+    }
+
+    SURVEY_OPTIONS {
+        uuid option_id PK
+        uuid question_id FK
+        int position
+        string label
+        string value_code
+    }
+
+    CAMPAIGN_DELIVERIES {
+        uuid delivery_id PK
+        uuid campaign_id FK
+        uuid member_id FK
+        string channel
+        string status
+        string idempotency_key UK
+        timestamptz delivered_at
+        timestamptz opened_at
+    }
+
+    SURVEY_RESPONSES {
+        uuid response_id PK
+        uuid campaign_id FK
+        uuid question_id FK
+        uuid member_id FK
+        uuid option_id FK
+        string free_text_encrypted
+        uuid source_event_id FK
+        timestamptz answered_at
+    }
+
+    AD_INTERACTIONS {
+        uuid interaction_id PK
+        uuid campaign_id FK
+        uuid member_id FK
+        string interaction_type
+        string destination_domain
+        uuid source_event_id FK
+        timestamptz occurred_at
+    }
+
+    AUDIT_LOG {
+        uuid audit_id PK
+        uuid actor_id
+        string actor_type
+        string action
+        string resource_type
+        uuid resource_id
+        string consent_scope
+        string request_id
+        timestamptz occurred_at
+    }
+
+    WARDS {
+        uuid ward_id PK
+        string municipality_code
+        string province_code
+        string ward_code UK
+        string display_name
+    }
+
+    WARDS ||--o{ MEMBERS : contains
+    WARDS ||--o{ ORG_NODES : locates
+    ORG_NODES ||--o{ MEMBERS : refers
+    ORG_NODES ||--o{ MEMBER_VOUCHES : issues
+    MEMBERS ||--o{ MEMBER_VOUCHES : receives
+    MEMBERS ||--o{ MEMBER_CONSENT_STATE : permits
+    ORG_NODES ||--o{ ORG_EDGES : parent
+    ORG_NODES ||--o{ ORG_EDGES : child
+    MEMBERS ||--o{ CHECKINS : submits
+    MEMBERS ||--|| MEMBER_STREAKS : has
+    MEMBERS ||--o{ POINTS_LEDGER : earns
+    EVENTS ||--o| CHECKINS : projects
+    EVENTS ||--o{ POINTS_LEDGER : causes
+    CLIENT_ORGS ||--o{ CAMPAIGNS : owns
+    CAMPAIGNS ||--o{ CAMPAIGN_REVIEWS : receives
+    CAMPAIGNS ||--o{ SURVEY_QUESTIONS : contains
+    SURVEY_QUESTIONS ||--o{ SURVEY_OPTIONS : offers
+    CAMPAIGNS ||--o{ CAMPAIGN_DELIVERIES : sends
+    MEMBERS ||--o{ CAMPAIGN_DELIVERIES : receives
+    CAMPAIGNS ||--o{ SURVEY_RESPONSES : collects
+    SURVEY_QUESTIONS ||--o{ SURVEY_RESPONSES : answers
+    SURVEY_OPTIONS ||--o{ SURVEY_RESPONSES : selected_in
+    MEMBERS ||--o{ SURVEY_RESPONSES : submits
+    CAMPAIGNS ||--o{ AD_INTERACTIONS : produces
+    MEMBERS ||--o{ AD_INTERACTIONS : performs

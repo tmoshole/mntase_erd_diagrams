@@ -1,0 +1,257 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Mntase Database Architecture - Manager Overview</title>
+  <style>
+    :root {
+      color-scheme: light;
+      font-family: Arial, sans-serif;
+      --ink: #3e2723;
+      --soft: #6d5148;
+      --clay: #a75d50;
+      --line: #dfd4cc;
+      --paper: #ffffff;
+      --canvas: #f5f1eb;
+      --green: #2e6e4a;
+      --gold: #9a6b1f;
+      --blue: #25556b;
+    }
+    * { box-sizing: border-box; }
+    body { margin: 0; background: var(--canvas); color: var(--ink); line-height: 1.55; }
+    main { width: min(1120px, calc(100% - 32px)); margin: 32px auto 64px; }
+    a { color: var(--clay); font-weight: 700; }
+    .toplink { display: inline-block; margin-bottom: 20px; }
+    .hero, .card, .callout {
+      background: var(--paper);
+      border: 1px solid var(--line);
+      border-radius: 18px;
+    }
+    .hero { padding: 36px; }
+    h1 { font-size: clamp(32px, 5vw, 52px); line-height: 1.05; margin: 0 0 16px; }
+    h2 { margin: 0 0 14px; font-size: 25px; }
+    h3 { margin: 0 0 8px; }
+    p { margin: 0 0 14px; }
+    .lead { color: var(--soft); font-size: 19px; max-width: 850px; }
+    .summary {
+      margin-top: 24px;
+      padding: 18px 20px;
+      background: #f7eee9;
+      border-left: 5px solid var(--clay);
+      border-radius: 10px;
+      font-weight: 700;
+    }
+    .grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 18px; margin: 24px 0; }
+    .card { padding: 24px; }
+    .tag {
+      display: inline-block;
+      padding: 4px 9px;
+      border-radius: 999px;
+      font-size: 12px;
+      font-weight: 800;
+      letter-spacing: .04em;
+      text-transform: uppercase;
+      margin-bottom: 12px;
+    }
+    .identity .tag { color: #7b342c; background: #fae8e4; }
+    .operational .tag { color: var(--blue); background: #e7f0f4; }
+    .analytics .tag { color: var(--green); background: #e8f2eb; }
+    .financial .tag { color: var(--gold); background: #fbf0db; }
+    ul { padding-left: 20px; margin: 10px 0 0; }
+    li { margin: 7px 0; }
+    .callout { padding: 28px; margin: 24px 0; }
+    .flow {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 12px;
+      margin-top: 18px;
+    }
+    .step {
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      padding: 16px;
+      background: #fffdfa;
+    }
+    .step strong { display: block; margin-bottom: 5px; }
+    table { width: 100%; border-collapse: collapse; margin-top: 16px; background: white; }
+    th, td { border: 1px solid var(--line); padding: 12px; text-align: left; vertical-align: top; }
+    th { background: #f3ebe5; }
+    .yes { color: var(--green); font-weight: 800; }
+    .no { color: #9b3f35; font-weight: 800; }
+    .limited { color: var(--gold); font-weight: 800; }
+    .footer-note { color: var(--soft); font-size: 14px; margin-top: 24px; }
+    @media (max-width: 760px) {
+      .grid, .flow { grid-template-columns: 1fr; }
+      .hero { padding: 24px; }
+      table { font-size: 13px; }
+    }
+    @media print {
+      body { background: white; }
+      main { width: 100%; margin: 0; }
+      .toplink { display: none; }
+      .hero, .card, .callout { break-inside: avoid; }
+    }
+  </style>
+</head>
+<body>
+  <main>
+    <a class="toplink" href="./index.html">&larr; View all ERD diagrams</a>
+
+    <section class="hero">
+      <h1>Why Mntase uses separate databases</h1>
+      <p class="lead">
+        Mntase handles different categories of sensitive information. Keeping
+        identity, activity, reporting, and payments in separate databases limits
+        the damage if one account or service is compromised.
+      </p>
+      <div class="summary">
+        The central rule: no single customer-facing system should be able to see
+        both who a member is and their private check-ins or survey answers.
+      </div>
+    </section>
+
+    <section class="grid">
+      <article class="card identity">
+        <span class="tag">Most restricted</span>
+        <h2>1. Identity Database</h2>
+        <p><strong>Answers:</strong> Who is this person, and may we contact them?</p>
+        <ul>
+          <li>Encrypted names, phone numbers, and email addresses</li>
+          <li>Login, OTP, device session, and push-notification details</li>
+          <li>Full consent history and communication preferences</li>
+        </ul>
+        <p><strong>Access:</strong> Only the Identity Service. Other systems use a random member ID.</p>
+      </article>
+
+      <article class="card operational">
+        <span class="tag">Pseudonymous</span>
+        <h2>2. Operational Database</h2>
+        <p><strong>Answers:</strong> What happened inside the product?</p>
+        <ul>
+          <li>Check-ins, survey responses, campaigns, points, and streaks</li>
+          <li>Mpintshi referrals and community relationships</li>
+          <li>Append-only events and workflow history</li>
+        </ul>
+        <p><strong>Protection:</strong> No names, phone numbers, emails, or payment details.</p>
+      </article>
+
+      <article class="card analytics">
+        <span class="tag">Aggregates only</span>
+        <h2>3. Analytics Database</h2>
+        <p><strong>Answers:</strong> What trends can Head Office and clients safely see?</p>
+        <ul>
+          <li>Ward, community, and province-level totals and trends</li>
+          <li>Campaign reach, response rates, and anonymised distributions</li>
+          <li>Mood and food-security indicators</li>
+        </ul>
+        <p><strong>Protection:</strong> No member IDs or raw responses. Small groups are suppressed.</p>
+      </article>
+
+      <article class="card financial">
+        <span class="tag">Financially restricted</span>
+        <h2>4. Financial Database</h2>
+        <p><strong>Answers:</strong> What must be paid or redeemed?</p>
+        <ul>
+          <li>Redemption requests, payout status, and reconciliation</li>
+          <li>Payment-provider tokens and masked destination labels</li>
+          <li>Mpintshi earnings and payout batches</li>
+        </ul>
+        <p><strong>Protection:</strong> Store provider tokens instead of full bank or wallet details.</p>
+      </article>
+    </section>
+
+    <section class="callout">
+      <h2>How the databases work together</h2>
+      <p>
+        They communicate through controlled services using random identifiers.
+        They are not joined together directly.
+      </p>
+      <div class="flow">
+        <div class="step"><strong>1. Member joins</strong>Identity records contact and consent, then creates a random member ID.</div>
+        <div class="step"><strong>2. Member participates</strong>Operational stores the check-in or survey under that random ID.</div>
+        <div class="step"><strong>3. Results are grouped</strong>An analytics worker creates privacy-safe totals after checking consent.</div>
+        <div class="step"><strong>4. Client sees results</strong>The reporting API returns aggregates only, never member records.</div>
+      </div>
+    </section>
+
+    <section class="callout">
+      <h2>Who can access what?</h2>
+      <table>
+        <thead>
+          <tr>
+            <th>System</th>
+            <th>Identity</th>
+            <th>Operational</th>
+            <th>Analytics</th>
+            <th>Financial</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Identity Service</td>
+            <td class="yes">Full</td>
+            <td class="no">None</td>
+            <td class="no">None</td>
+            <td class="no">None</td>
+          </tr>
+          <tr>
+            <td>Core Mntase Application</td>
+            <td class="limited">Controlled API</td>
+            <td class="yes">Full</td>
+            <td class="no">None</td>
+            <td class="limited">Controlled API</td>
+          </tr>
+          <tr>
+            <td>Analytics Worker</td>
+            <td class="no">None</td>
+            <td class="limited">Read-only</td>
+            <td class="yes">Write</td>
+            <td class="no">None</td>
+          </tr>
+          <tr>
+            <td>Customer Portal</td>
+            <td class="no">None</td>
+            <td class="no">None</td>
+            <td class="limited">Approved reports only</td>
+            <td class="no">None</td>
+          </tr>
+          <tr>
+            <td>Payment Service</td>
+            <td class="limited">Minimum contact via API</td>
+            <td class="no">None</td>
+            <td class="no">None</td>
+            <td class="yes">Full</td>
+          </tr>
+        </tbody>
+      </table>
+    </section>
+
+    <section class="callout">
+      <h2>What risk does this reduce?</h2>
+      <ul>
+        <li><strong>Identity breach:</strong> Activity and financial history are not present in the stolen database.</li>
+        <li><strong>Operational breach:</strong> Records contain random IDs rather than names or contact details.</li>
+        <li><strong>Client-account breach:</strong> The attacker can reach only approved aggregate reports.</li>
+        <li><strong>Payment breach:</strong> Check-ins, surveys, and identity records remain outside the payment database.</li>
+        <li><strong>Internal mistakes:</strong> Separate credentials and service accounts reduce accidental over-access.</li>
+      </ul>
+    </section>
+
+    <section class="callout">
+      <h2>Recommended rollout</h2>
+      <ol>
+        <li>Start with separate Identity and Operational databases.</li>
+        <li>Add Analytics once check-ins and campaigns produce real data.</li>
+        <li>Add Financial when real redemptions and payouts begin.</li>
+        <li>Give every service its own account, permissions, backups, and audit trail.</li>
+      </ol>
+      <p class="footer-note">
+        Separation improves security, but it does not replace encryption,
+        consent enforcement, least-privilege access, monitoring, backups, or
+        incident procedures.
+      </p>
+    </section>
+  </main>
+</body>
+</html>

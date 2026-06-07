@@ -1,0 +1,94 @@
+erDiagram
+    FINANCIAL_ACCOUNTS {
+        uuid financial_account_id PK
+        uuid member_id UK
+        string status
+        string currency
+        timestamptz created_at
+        timestamptz suspended_at
+    }
+
+    PAYMENT_DESTINATIONS {
+        uuid destination_id PK
+        uuid financial_account_id FK
+        string destination_type
+        string provider
+        string provider_token
+        string masked_label
+        string verification_status
+        string key_version
+        timestamptz verified_at
+        timestamptz created_at
+    }
+
+    REDEMPTION_REQUESTS {
+        uuid redemption_id PK
+        uuid financial_account_id FK
+        uuid destination_id FK
+        int points_debited
+        numeric amount_zar
+        string status
+        string idempotency_key UK
+        timestamptz requested_at
+        timestamptz completed_at
+    }
+
+    PAYMENT_TRANSACTIONS {
+        uuid transaction_id PK
+        uuid redemption_id FK
+        string provider
+        string provider_reference UK
+        numeric amount_zar
+        string status
+        string failure_code
+        timestamptz submitted_at
+        timestamptz settled_at
+    }
+
+    EARNINGS_LEDGER {
+        uuid earnings_entry_id PK
+        uuid beneficiary_id
+        string beneficiary_type
+        uuid campaign_id
+        numeric amount_zar
+        string reason_code
+        string idempotency_key UK
+        timestamptz accrued_at
+    }
+
+    PAYOUT_BATCHES {
+        uuid batch_id PK
+        string provider
+        string status
+        numeric total_amount_zar
+        int transaction_count
+        timestamptz created_at
+        timestamptz submitted_at
+        timestamptz settled_at
+    }
+
+    PAYOUT_BATCH_ITEMS {
+        uuid batch_item_id PK
+        uuid batch_id FK
+        uuid earnings_entry_id FK
+        uuid transaction_id FK
+        string status
+    }
+
+    FINANCIAL_AUDIT_LOG {
+        uuid audit_id PK
+        uuid actor_id
+        string action
+        string resource_type
+        uuid resource_id
+        string request_id
+        timestamptz occurred_at
+    }
+
+    FINANCIAL_ACCOUNTS ||--o{ PAYMENT_DESTINATIONS : owns
+    FINANCIAL_ACCOUNTS ||--o{ REDEMPTION_REQUESTS : requests
+    PAYMENT_DESTINATIONS ||--o{ REDEMPTION_REQUESTS : receives
+    REDEMPTION_REQUESTS ||--o{ PAYMENT_TRANSACTIONS : attempts
+    PAYOUT_BATCHES ||--o{ PAYOUT_BATCH_ITEMS : contains
+    EARNINGS_LEDGER ||--o{ PAYOUT_BATCH_ITEMS : settles
+    PAYMENT_TRANSACTIONS ||--o{ PAYOUT_BATCH_ITEMS : executes
