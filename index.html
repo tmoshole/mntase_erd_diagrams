@@ -33,8 +33,15 @@
     }
     .card { background: white; border: 1px solid #dfd4cc; border-radius: 16px; margin: 24px 0; padding: 20px; }
     .heading { display: flex; align-items: center; justify-content: space-between; gap: 16px; }
-    .heading h2 { margin: 0 0 16px; }
+    .heading h2 { margin: 0; }
     .heading a { color: #8d4f43; font-weight: 700; margin-left: 12px; }
+    .explanation {
+      max-width: 900px;
+      margin: 8px 0 18px;
+      color: #6d5148;
+      font-size: 16px;
+      line-height: 1.5;
+    }
     img { display: block; width: 100%; height: auto; border-radius: 8px; }
   </style>
 </head>
@@ -53,6 +60,11 @@
             <a href="./01-security-overview.png">PNG</a>
           </div>
         </div>
+        <p class="explanation">
+          This shows how the Mntase applications safely pass information between
+          separate databases, so no single part of the system holds everything
+          about a person.
+        </p>
         <a href="./01-security-overview.svg">
           <img src="./01-security-overview.svg" alt="Security Boundary Overview ERD" loading="lazy">
         </a>
@@ -66,6 +78,10 @@
             <a href="./02-identity-database.png">PNG</a>
           </div>
         </div>
+        <p class="explanation">
+          This is the secure address book: it keeps member contact details,
+          login information, communication choices, and consent history.
+        </p>
         <a href="./02-identity-database.svg">
           <img src="./02-identity-database.svg" alt="Identity Database ERD" loading="lazy">
         </a>
@@ -79,6 +95,11 @@
             <a href="./03-operational-database.png">PNG</a>
           </div>
         </div>
+        <p class="explanation">
+          This records what happens in Mntase, such as check-ins, surveys,
+          campaigns, points, referrals, and community activity, without storing
+          members' names or contact details.
+        </p>
         <a href="./03-operational-database.svg">
           <img src="./03-operational-database.svg" alt="Operational Database ERD" loading="lazy">
         </a>
@@ -92,6 +113,10 @@
             <a href="./04-analytics-database.png">PNG</a>
           </div>
         </div>
+        <p class="explanation">
+          This turns activity into anonymous totals and trends that clients and
+          Head Office can use without seeing individual member responses.
+        </p>
         <a href="./04-analytics-database.svg">
           <img src="./04-analytics-database.svg" alt="Analytics Database ERD" loading="lazy">
         </a>
@@ -105,6 +130,10 @@
             <a href="./05-financial-database.png">PNG</a>
           </div>
         </div>
+        <p class="explanation">
+          This keeps track of money-related activity, including member
+          redemptions, Mpintshi earnings, payouts, and payment status.
+        </p>
         <a href="./05-financial-database.svg">
           <img src="./05-financial-database.svg" alt="Financial Database ERD" loading="lazy">
         </a>
